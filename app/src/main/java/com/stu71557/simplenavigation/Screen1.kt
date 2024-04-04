@@ -1,75 +1,83 @@
 package com.stu71557.simplenavigation
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.compose.ui.unit.sp
+import com.stu71557.simplenavigation.models.Movie
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Screen1(navController: NavController) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                colors = topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text(
-                        text = "Screen 1",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentSize(Alignment.Center)
-                    )
-                }
+fun Screen1(
+    movies: List<Movie>,
+    paddingValues: PaddingValues,
+    onNavigateToSecondScreen: (Movie) -> Unit
+) {
 
-            )
-        },
-        bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.primary,
-            ) {
-                Text(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    text = "Screen 1 bottom app bar",
-                )
-            }
-        },
+    MovieList(movies = movies, contentPadding = paddingValues, onNavigateToSecondScreen = onNavigateToSecondScreen)
 
-        ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = "This is the first screen.".trimIndent(),
-            )
-           ToScreen2Button(onClick = {
-               navController.navigate(Routes.SecondScreen.route)
-           })
+}
+
+@Composable
+private fun MovieList(
+    movies: List<Movie>,
+    contentPadding: PaddingValues,
+    onNavigateToSecondScreen: (Movie) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyVerticalGrid(
+        modifier = modifier.padding(8.dp),
+        contentPadding = contentPadding,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        columns = GridCells.Fixed(3)
+    ) {
+        items(movies) { movie ->
+            MovieItem(movie = movie, onClick = { onNavigateToSecondScreen(movie) })
         }
+    }
+}
+
+@Composable
+private fun MovieItem(
+    movie: Movie, onClick: () -> Unit, modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(5.dp))
+            .clickable { onClick() }
+            .size(width = 140.dp, height = 300.dp),
+        verticalArrangement = Arrangement.spacedBy(5.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Image(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(240.dp)
+                .clip(RoundedCornerShape(8.dp)),
+            painter = painterResource(id = movie.posterResId),
+            contentScale = ContentScale.Crop,
+            contentDescription = "Movie poster",
+        )
+
+        Text(
+            text = movie.title, fontSize = 14.sp
+        )
     }
 }
